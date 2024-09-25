@@ -1,30 +1,30 @@
-﻿using Telegram.Bot;
+﻿using Courses.Abstractions;
+using Courses.Configs;
+using Microsoft.Extensions.Options;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Courses;
+namespace Courses.Implementations;
 
-public class BotHost
+public class BotHost : IBotHost
 {
-    private readonly string _token;
     private readonly TelegramBotClient _client;
 
-    public BotHost(string token)
+    public BotHost(IOptions<BotConfig> config)
     {
-        _token = token;
-        _client = new TelegramBotClient(token);
+        _client = new TelegramBotClient(config.Value.TelegramToken);
     }
 
     public void Start()
     {
         _client.StartReceiving(UpdateHandler, ErrorHandler);
-        
     }
 
     private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if (update.Type == UpdateType.CallbackQuery)
+        if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery?.Message != null)
         {
             await client.SendTextMessageAsync(
                 update.CallbackQuery.Message.Chat.Id,
@@ -33,10 +33,8 @@ public class BotHost
             return;
         }
         
-        
         InlineKeyboardMarkup inlineKeyboard = new( new[]
         {
-            // first row
             new[]
             {
                 InlineKeyboardButton.WithCallbackData(text: "Button 1", callbackData: "callback 1"),
@@ -44,17 +42,23 @@ public class BotHost
             },
  
         });
-        
-        
-        await client.SendTextMessageAsync(
-            update.Message.Chat.Id,
-            "Buttons",
-            replyMarkup: inlineKeyboard,
-            cancellationToken: token);
+
+
+        if (update.Message != null)
+        {
+            await client.SendTextMessageAsync(
+                update.Message.Chat.Id,
+                "Buttons",
+                replyMarkup: inlineKeyboard,
+                cancellationToken: token);
+        }
+
+        throw new ArgumentException("Unexpected chat ID");
     }
 
-    private async Task ErrorHandler(ITelegramBotClient client, Exception ex, CancellationToken token )
+    private static Task ErrorHandler(ITelegramBotClient client, Exception ex, CancellationToken token )
     {
-        var q = 0;
+        Console.WriteLine(ex.ToString());
+        return Task.CompletedTask;
     }
 }
