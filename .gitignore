@@ -1,0 +1,77 @@
+# Folders
+/.idea
+/Courses/bin
+/Courses/obj
+
+#archives
+*.zip
+
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+*.user
+*.dcu
+*.ddp
+*.dfm
+*.dpr
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+*.exe
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.cache
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+*.crc
+*.version
+*.bin
+*.suo
+*.dat
+*.sst
+*.log
+*.iml
+*.xml
+
+*.Net.sln.DotSettings.user
+
