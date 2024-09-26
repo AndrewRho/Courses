@@ -1,14 +1,13 @@
-﻿using Courses.Abstractions;
-using Courses.Configs;
+﻿using Courses.Configs;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Courses.BotHandlers;
 
-public class MainMenuBotHandler : IBotHandler
+public class MainMenuBotHandler : BotHandlerBase
 {
-    public async Task Handle(ITelegramBotClient client, ChatId chatId, CancellationToken token)
+    protected override async Task HandleSafe(ITelegramBotClient client, ChatId chatId, CancellationToken token)
     {
         InlineKeyboardMarkup scheduleButtons = new( 
             new[]
@@ -27,10 +26,5 @@ public class MainMenuBotHandler : IBotHandler
         );
         
         await client.SendTextMessageAsync(chatId, "Розклад занять", replyMarkup: scheduleButtons, cancellationToken: token);
-    }
-
-    public IBotHandler? GetNext()
-    {
-        return null;
     }
 }

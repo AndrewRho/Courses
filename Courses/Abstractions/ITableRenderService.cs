@@ -4,5 +4,5 @@ namespace Courses.Abstractions;
 
 public interface ITableRenderService
 {
-    string GetAllDisciplinesInfo(DisciplineModel[] models);
+    string GetAllDisciplineInfo(DisciplineModel model);
 }

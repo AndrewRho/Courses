@@ -5,7 +5,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace Courses.BotHandlers;
 
-public class InfoBotHandler : IBotHandler
+public class InfoBotHandler : BotHandlerBase
 {
     private readonly IDisciplineRepository _disciplineRepository;
     private readonly ITableRenderService _render; 
@@ -16,15 +16,18 @@ public class InfoBotHandler : IBotHandler
         _render = render;
     }
 
-    public async Task Handle(ITelegramBotClient client, ChatId chatId, CancellationToken token)
-    {
-        var models = _disciplineRepository.GetAllWithTopics();
-        var table = _render.GetAllDisciplinesInfo(models);
-        await client.SendTextMessageAsync(chatId, table, parseMode: ParseMode.Html, cancellationToken: token);
-    }
-
-    public IBotHandler? GetNext()
+    public override IBotHandler GetNext()
     {
         return new MainMenuBotHandler();
+    }
+    
+    protected override async Task HandleSafe(ITelegramBotClient client, ChatId chatId, CancellationToken token)
+    {
+        var models = _disciplineRepository.GetAllWithTopics();
+        foreach (var m in models)
+        {
+            var table = _render.GetAllDisciplineInfo(m);
+            await client.SendTextMessageAsync(chatId, table, parseMode: ParseMode.Html, cancellationToken: token);
+        }
     }
 }

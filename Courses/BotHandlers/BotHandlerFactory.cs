@@ -26,8 +26,8 @@ public class BotHandlerFactory : IBotHandlerFactory
     {
         if (update.Message?.Type == MessageType.Document)
         {
-            // we expect work plans in .TXT format only
-            return new DownloadDisciplinePlanBotHandler(
+            // we expect work plans or schedules in .TXT format, UTF-8
+            return new DownloadTextFileBotHandler(
                 _config,
                 update.Message?.Document?.FileId ?? string.Empty,
                 _disciplineRepository);

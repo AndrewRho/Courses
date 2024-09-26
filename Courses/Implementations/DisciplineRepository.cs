@@ -27,12 +27,23 @@ public class DisciplineRepository : IDisciplineRepository
     
     public bool IsExists(string name)
     {
+        return GetId(name) >= 0;
+    }
+    
+    public int GetId(string name)
+    {
         using var conn = new SqlConnection(_connString);
-        using var command = new SqlCommand("select top 1 * from disciplines where name = @name", conn);
+        using var command = new SqlCommand("select top 1 id from disciplines where name = @name", conn);
         command.Parameters.AddWithValue("@name", name);
         conn.Open();
         using var reader = command.ExecuteReader();
-        return reader.HasRows;
+        if (!reader.HasRows)
+        {
+            return -1;
+        }
+
+        reader.Read();
+        return Convert.ToInt32(reader["id"]);
     }
     
     public int Create(string name)
@@ -63,6 +74,27 @@ public class DisciplineRepository : IDisciplineRepository
         }
 
         return result.ToArray();
+    }
+
+    public void UpdateSchedule(ScheduleModel[] schedule)
+    {
+        using var conn = new SqlConnection(_connString);
+        using var command = new SqlCommand("delete from schedule", conn);
+        conn.Open();
+        command.ExecuteNonQuery();
+
+        foreach (var s in schedule)
+        {
+            using var scheduleCommand = new SqlCommand("insert into schedule (disciplineId, isLecture, timeSlotId, slotDate) " +
+                                                    "values (@disciplineId, @isLecture, @timeSlotId, @slotDate)", conn);
+
+            scheduleCommand.Parameters.AddWithValue("@disciplineId", s.DisciplineId);
+            scheduleCommand.Parameters.AddWithValue("@isLecture", s.IsLecture);
+            scheduleCommand.Parameters.AddWithValue("@timeSlotId", s.TimeSlotId);
+            scheduleCommand.Parameters.AddWithValue("@slotDate", s.SlotDate);
+
+            scheduleCommand.ExecuteNonQuery();
+        }
     }
 
     public void Delete(string name)
@@ -112,6 +144,26 @@ public class DisciplineRepository : IDisciplineRepository
         }
 
         return models.ToArray();
+    }
+
+    public TimeSlotModel[] GetTimeSlots()
+    {
+        var result = new List<TimeSlotModel>();
+        using var conn = new SqlConnection(_connString);
+        using var command = new SqlCommand("select id, timeFrom, timeTo from timeSlots", conn);
+        conn.Open();
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            result.Add(new TimeSlotModel
+            {
+                Id = Convert.ToInt32(reader["id"]),
+                TimeFrom = Convert.ToString(reader["timeFrom"]) ?? string.Empty,
+                TimeTo = Convert.ToString(reader["timeTo"]) ?? string.Empty,
+            });
+        }
+
+        return result.ToArray();
     }
 
     public void UpdateTopics(TopicModel[] topics)

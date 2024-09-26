@@ -4,14 +4,14 @@ using Telegram.Bot.Types;
 
 namespace Courses.BotHandlers;
 
-public class StartBotHandler : IBotHandler
+public class StartBotHandler : BotHandlerBase
 {
-    public async Task Handle(ITelegramBotClient client, ChatId chatId, CancellationToken token)
+    protected override async Task HandleSafe(ITelegramBotClient client, ChatId chatId, CancellationToken token)
     {
         await client.SendTextMessageAsync(chatId, GetGreeting() + " Оберіть потрібну дію.", cancellationToken: token);
     }
 
-    public IBotHandler GetNext()
+    public override IBotHandler GetNext()
     {
         return new MainMenuBotHandler();
     }
