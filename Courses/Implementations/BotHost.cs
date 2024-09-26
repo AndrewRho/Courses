@@ -3,17 +3,17 @@ using Courses.Configs;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Courses.Implementations;
 
 public class BotHost : IBotHost
 {
     private readonly TelegramBotClient _client;
+    private readonly IBotHandlerFactory _factory;
 
-    public BotHost(IOptions<BotConfig> config)
+    public BotHost(IOptions<BotConfig> config, IBotHandlerFactory factory)
     {
+        _factory = factory;
         _client = new TelegramBotClient(config.Value.TelegramToken);
     }
 
@@ -24,36 +24,15 @@ public class BotHost : IBotHost
 
     private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
     {
-        if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery?.Message != null)
-        {
-            await client.SendTextMessageAsync(
-                update.CallbackQuery.Message.Chat.Id,
-                "Got it",
-                cancellationToken: token);
-            return;
-        }
+        var handler = _factory.GetHandler(update);
+        var chatId = _factory.GetChatId(update);
         
-        InlineKeyboardMarkup inlineKeyboard = new( new[]
+        // handlers chain. Each handler may return next non-null handler which will be processed in scope of this update
+        while (handler != null)
         {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Button 1", callbackData: "callback 1"),
-                InlineKeyboardButton.WithCallbackData(text: "Button 2", callbackData: "callback 2"),
-            },
- 
-        });
-
-
-        if (update.Message != null)
-        {
-            await client.SendTextMessageAsync(
-                update.Message.Chat.Id,
-                "Buttons",
-                replyMarkup: inlineKeyboard,
-                cancellationToken: token);
+            await handler.Handle(client, chatId, token);
+            handler = handler.GetNext();
         }
-
-        throw new ArgumentException("Unexpected chat ID");
     }
 
     private static Task ErrorHandler(ITelegramBotClient client, Exception ex, CancellationToken token )

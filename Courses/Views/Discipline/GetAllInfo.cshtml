@@ -1,0 +1,43 @@
+﻿@model Courses.Models.DisciplineModel[]
+
+@{
+    Layout = null;
+}
+
+    <table style="column-span: 5">
+        <thead>
+            <tr>
+                <th>N</th>
+                <th>Назва дисціплини/Теми</th>
+                <th>Лекції</th>
+                <th>Практики</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            @{ var disciplineIx = 1;}
+            @foreach (var m in Model)
+            {
+                <tr>
+                    <td>@disciplineIx</td><td>@m.DisciplineName</td>
+                    <td>@m.TotalLectures</td>
+                    <td>@m.TotalPractices</td>
+                </tr>
+                
+                @foreach (var t in m.Topics)
+                {
+                    <tr>
+                        @{ var topicCode = disciplineIx + "." + t.TopicNumber; }
+                        <td>@topicCode</td>
+                        <td>@t.TopicName</td>
+                        <td>@t.Lectures</td>
+                        <td>@t.Practices</td>
+                    </tr>                    
+                }
+                disciplineIx ++;
+            }
+        </tbody>
+    </table>
+
+
+
