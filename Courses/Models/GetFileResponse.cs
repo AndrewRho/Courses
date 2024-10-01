@@ -1,4 +1,6 @@
-﻿namespace Courses.Models;
+﻿using Newtonsoft.Json;
+
+namespace Courses.Models;
 
 public class GetFileResponse
 {
@@ -8,8 +10,15 @@ public class GetFileResponse
 
 public class GetFileResponseResult
 {
-    public string file_id { get; set; } = string.Empty;
-    public string file_unique_id { get; set; } = string.Empty;
-    public int file_size { get; set; }
-    public string file_path { get; set; } = string.Empty;
+    [JsonProperty("file_id")]
+    public string FileId { get; set; } = string.Empty;
+    
+    [JsonProperty("file_unique_id")]
+    public string FileUniqueId { get; set; } = string.Empty;
+
+    [JsonProperty("file_size")]
+    public int FileSize { get; set; }
+
+    [JsonProperty("file_path")]
+    public string FilePath { get; set; } = string.Empty;
 }

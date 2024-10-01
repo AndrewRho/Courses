@@ -1,20 +1,20 @@
 ﻿using Courses.Configs;
+using Courses.Models;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Courses.BotHandlers;
 
 public class MainMenuBotHandler : BotHandlerBase
 {
-    protected override async Task HandleSafe(ITelegramBotClient client, ChatId chatId, CancellationToken token)
+    protected override async Task HandleSafe(ChatContext context)
     {
         InlineKeyboardMarkup scheduleButtons = new( 
             new[]
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "Cьогодні", "get.schedule.today"),
+                    InlineKeyboardButton.WithCallbackData(text: "Cьогодні", ActionNames.GetScheduleToday),
                     InlineKeyboardButton.WithCallbackData(text: "На тиждень", "get.schedule.week")
                 },
                 new[]
@@ -25,6 +25,10 @@ public class MainMenuBotHandler : BotHandlerBase
             }
         );
         
-        await client.SendTextMessageAsync(chatId, "Розклад занять", replyMarkup: scheduleButtons, cancellationToken: token);
+        await context.Client.SendTextMessageAsync(
+            context.ChatId, 
+            "Розклад занять",
+            replyMarkup: scheduleButtons, 
+            cancellationToken: context.CancelToken);
     }
 }

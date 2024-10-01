@@ -1,11 +1,10 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
+﻿using Courses.Models;
 
 namespace Courses.Abstractions;
 
 public interface IBotHandler
 {
-    Task Handle(ITelegramBotClient client, ChatId chatId, CancellationToken token);
+    Task Handle(ChatContext context);
 
-    IBotHandler? GetNext();
+    Type? GetNextHandlerType();
 }

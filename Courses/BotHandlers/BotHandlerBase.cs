@@ -1,28 +1,28 @@
 ﻿using Courses.Abstractions;
+using Courses.Models;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace Courses.BotHandlers;
 
 public abstract class BotHandlerBase : IBotHandler
 {
-    public async Task Handle(ITelegramBotClient client, ChatId chatId, CancellationToken token)
+    public async Task Handle(ChatContext context)
     {
         try
         {
-            await HandleSafe(client, chatId, token);
+            await HandleSafe(context);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            await client.SendTextMessageAsync(chatId, $"На жаль, сталася помилка. {e.Message}", cancellationToken: token);
+            await context.Client.SendTextMessageAsync(context.ChatId, $"На жаль, сталася помилка. {e.Message}", cancellationToken: context.CancelToken);
         }
     }
 
-    public virtual IBotHandler? GetNext()
+    public virtual Type? GetNextHandlerType()
     {
         return null;
     }
 
-    protected abstract Task HandleSafe(ITelegramBotClient client, ChatId chatId, CancellationToken token);
+    protected abstract Task HandleSafe(ChatContext context);
 }

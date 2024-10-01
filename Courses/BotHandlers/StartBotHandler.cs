@@ -1,19 +1,17 @@
-﻿using Courses.Abstractions;
-using Telegram.Bot;
-using Telegram.Bot.Types;
+﻿using Courses.Models;
 
 namespace Courses.BotHandlers;
 
 public class StartBotHandler : BotHandlerBase
 {
-    protected override async Task HandleSafe(ITelegramBotClient client, ChatId chatId, CancellationToken token)
+    protected override async Task HandleSafe(ChatContext context)
     {
-        await client.SendTextMessageAsync(chatId, GetGreeting() + " Оберіть потрібну дію.", cancellationToken: token);
+        await context.Say( GetGreeting() + " Оберіть потрібну дію.");
     }
 
-    public override IBotHandler GetNext()
+    public override Type GetNextHandlerType()
     {
-        return new MainMenuBotHandler();
+        return typeof(MainMenuBotHandler);
     }
 
     private static string GetGreeting()

@@ -1,4 +1,5 @@
 ﻿using Courses.Abstractions;
+using Courses.Data.Entities;
 using Courses.Models;
 
 namespace Courses.Implementations;

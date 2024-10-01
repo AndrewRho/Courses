@@ -1,33 +1,31 @@
 ﻿using Courses.Abstractions;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Courses.Models;
 
 namespace Courses.BotHandlers;
 
 public class InfoBotHandler : BotHandlerBase
 {
-    private readonly IDisciplineRepository _disciplineRepository;
     private readonly ITableRenderService _render; 
 
-    public InfoBotHandler(IDisciplineRepository disciplineRepository, ITableRenderService render)
+    public InfoBotHandler(ITableRenderService render)
     {
-        _disciplineRepository = disciplineRepository;
         _render = render;
     }
 
-    public override IBotHandler GetNext()
+    public override Type GetNextHandlerType()
     {
-        return new MainMenuBotHandler();
+        return typeof(MainMenuBotHandler);
     }
     
-    protected override async Task HandleSafe(ITelegramBotClient client, ChatId chatId, CancellationToken token)
+    protected override async Task HandleSafe(ChatContext context)
     {
+        /*
         var models = _disciplineRepository.GetAllWithTopics();
         foreach (var m in models)
         {
             var table = _render.GetAllDisciplineInfo(m);
             await client.SendTextMessageAsync(chatId, table, parseMode: ParseMode.Html, cancellationToken: token);
         }
+        */
     }
 }
