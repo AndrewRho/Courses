@@ -1,15 +1,22 @@
 ﻿using Courses.Abstractions;
 using Courses.Models;
+using Microsoft.EntityFrameworkCore;
+using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 
 namespace Courses.BotHandlers;
 
 public class InfoBotHandler : BotHandlerBase
 {
-    private readonly ITableRenderService _render; 
+    private readonly ITableRenderService _render;
+    private readonly ICoursesBotContextFactory _contextFactory;
 
-    public InfoBotHandler(ITableRenderService render)
+    public InfoBotHandler(
+        ITableRenderService render,
+        ICoursesBotContextFactory contextFactory)
     {
         _render = render;
+        _contextFactory = contextFactory;
     }
 
     public override Type GetNextHandlerType()
@@ -19,13 +26,38 @@ public class InfoBotHandler : BotHandlerBase
     
     protected override async Task HandleSafe(ChatContext context)
     {
-        /*
-        var models = _disciplineRepository.GetAllWithTopics();
+        using var dbContext = _contextFactory.GetContext();
+        var entities = dbContext.Disciplines
+            .Include(x => x.Topics)
+            .ThenInclude(x => x.WorkPlans)
+            .Where(x => x.Topics.Single().WorkPlans.Single().User.Id == context.UserId)
+            .ToArray();
+
+
+        var models = new List<DisciplineModel>();
+        foreach (var e in entities)
+        {
+            var model = new DisciplineModel
+            {
+                DisciplineName = e.Name,
+                TotalLectures = e.Topics.SelectMany(x => x.WorkPlans).Sum(x => x.Lectures),
+                TotalPractices = e.Topics.SelectMany(x => x.WorkPlans).Sum(x => x.Practices),
+                Topics = e.Topics.Select(t => new TopicModel
+                {
+                    TopicName = t.Name,
+                    TopicNumber = t.Number,
+                    Lectures = t.WorkPlans.Sum(x => x.Lectures),
+                    Practices = t.WorkPlans.Sum(x => x.Practices)
+                }).ToArray()
+            };
+            
+            models.Add(model);
+        }
+
         foreach (var m in models)
         {
             var table = _render.GetAllDisciplineInfo(m);
-            await client.SendTextMessageAsync(chatId, table, parseMode: ParseMode.Html, cancellationToken: token);
+            await context.Client.SendTextMessageAsync(context.ChatId, table, parseMode: ParseMode.Html, cancellationToken: context.CancelToken);
         }
-        */
     }
 }

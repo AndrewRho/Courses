@@ -75,7 +75,8 @@ public class Initial : Migration
                 timeSlotId = cb.Column<int>(),
                 lectures = cb.Column<int>(),
                 practices = cb.Column<int>(),
-                date = cb.Column<DateTime>()
+                date = cb.Column<DateTime>(),
+                progress = cb.Column<string>()
             },
             constraints: ctb =>
             {

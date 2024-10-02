@@ -1,8 +1,9 @@
 ﻿using Courses.Abstractions;
 using Courses.Configs;
+using Courses.Data;
 using Microsoft.Extensions.Options;
 
-namespace Courses.Data;
+namespace Courses.Factories;
 
 public class CoursesBotContextFactory : ICoursesBotContextFactory
 {

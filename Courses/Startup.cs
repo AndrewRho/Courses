@@ -1,7 +1,6 @@
 ﻿using Courses.Abstractions;
 using Courses.BotHandlers;
 using Courses.Configs;
-using Courses.Data;
 using Courses.Data.Entities;
 using Courses.Factories;
 using Courses.Implementations;
@@ -94,7 +93,10 @@ public class Startup
             .AddTransient<IScheduleService, ScheduleService>()
             .AddTransient<StartBotHandler>()
             .AddTransient<TodayBotHandler>()
+            .AddTransient<WeekBotHandler>()
+            .AddTransient<SemesterBotHandler>()
             .AddTransient<TextFileBotHandler>()
+            .AddTransient<InfoBotHandler>()
             .AddTransient<MainMenuBotHandler>();
     }
 }

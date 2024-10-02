@@ -57,7 +57,15 @@ public class BotHandlerFactory : IBotHandlerFactory
             }
 
             var chatId = message.Chat.Id;
-            return new ChatContext(botClient, chatId, userId.Value, token);
+            var chatContext = new ChatContext(botClient, chatId, userId.Value, token); 
+            
+            if (update.Message?.Type == MessageType.Document)
+            {
+                var fileId = update.Message?.Document?.FileId ?? string.Empty; // todo fill in chatContext
+                chatContext.FileId = fileId;
+            }
+            
+            return chatContext;
         }
         
         if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery?.Message != null)
@@ -65,13 +73,6 @@ public class BotHandlerFactory : IBotHandlerFactory
             var chatId = update.CallbackQuery.Message.Chat.Id;
             var userId = update.CallbackQuery.From.Id;
             var chatContext = new ChatContext(botClient, chatId, userId, token);
-        
-            if (update.Message?.Type == MessageType.Document)
-            {
-                var fileId = update.Message?.Document?.FileId ?? string.Empty; // todo fill in chatContext
-                chatContext.FileId = fileId;
-            }
-            
             return chatContext;
         }
 
@@ -91,6 +92,8 @@ public class BotHandlerFactory : IBotHandlerFactory
             case ActionNames.ViewMainMenu: return _provider.GetRequiredService<MainMenuBotHandler>();
             case ActionNames.GetAllInfo : return _provider.GetRequiredService<InfoBotHandler>();
             case ActionNames.GetScheduleToday : return _provider.GetRequiredService<TodayBotHandler>();
+            case ActionNames.GetScheduleWeek : return _provider.GetRequiredService<WeekBotHandler>();
+            case ActionNames.GetScheduleSemesterLeft : return _provider.GetRequiredService<SemesterBotHandler>();
         }
 
         return null;

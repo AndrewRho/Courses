@@ -14,7 +14,7 @@ public class ScheduleService : IScheduleService
         _contextFactory = contextFactory;
     }
 
-    public async Task Process(ChatContext chatContext, string[] lines)
+    public async Task ProcessTextFile(ChatContext chatContext, string[] lines)
     {
         await chatContext.Say("Отримано розклад занять");
         using var dbContext = _contextFactory.GetContext();
@@ -117,8 +117,28 @@ public class ScheduleService : IScheduleService
         await dbContext.SaveChangesAsync();
     }
 
+    public ScheduleEntity[] GetSchedule(DateTime dateFrom, DateTime dateTo, long userId)
+    {
+        using var dbContext = _contextFactory.GetContext();
+        var schedules = dbContext.Schedules
+            .Include( x=> x.TimeSlot)
+            .Include( x => x.WorkPlan)
+            .ThenInclude( x => x.Topic)
+            .ThenInclude( x => x.Discipline)
+            .Where(x => x.WorkPlan.User.Id == userId)
+            .Where(x => x.Date >= dateFrom && x.Date <= dateTo)
+            .OrderBy( x => x.Date)
+            .ThenBy( x => x.TimeSlot.Id)
+            .ToArray();
+
+        return schedules;
+    }
+
     private class WorkPlanExtended
     {
+        private int _originalLectures;
+        private int _originalPractices;
+
         public WorkPlanEntity WorkPlan { get; }
 
         public int GetLecturesLeft()
@@ -134,16 +154,32 @@ public class ScheduleService : IScheduleService
         public WorkPlanExtended(WorkPlanEntity workPlan)
         {
             WorkPlan = workPlan;
+            _originalLectures = workPlan.Lectures;
+            _originalPractices = workPlan.Practices;
         }
 
         public void AddSchedule(ScheduleModel scheduleModel, TimeSlotEntity timeSlotEntity)
         {
+            var progress = string.Empty;
+            if (scheduleModel.Lectures > 0)
+            {
+                var totalCovered = _originalLectures - GetLecturesLeft() + 2;
+                progress = $"{totalCovered}/{_originalLectures}";
+            }
+
+            if (scheduleModel.Practices > 0)
+            {
+                var totalCovered = _originalPractices - GetPracticesLeft() + 2;
+                progress = $"{totalCovered}/{_originalPractices}";
+            }
+            
             WorkPlan.Schedules.Add(new ScheduleEntity
             {
                 Date = scheduleModel.SlotDate,
                 Lectures = scheduleModel.Lectures,
                 Practices = scheduleModel.Practices,
-                TimeSlot = timeSlotEntity
+                TimeSlot = timeSlotEntity,
+                Progress = progress
             });
         }
     }

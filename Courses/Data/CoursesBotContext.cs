@@ -6,7 +6,6 @@ namespace Courses.Data;
 public class CoursesBotContext : DbContext
 {
     private readonly string _connString;
-
     public DbSet<TimeSlotEntity> TimeSlots { get; protected set; } = default!;
     public DbSet<UserEntity> Users { get; protected set; } = default!;
     public DbSet<ScheduleEntity> Schedules { get; protected set; } = default!;

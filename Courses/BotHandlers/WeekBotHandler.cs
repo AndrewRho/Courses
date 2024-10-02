@@ -2,9 +2,9 @@
 
 namespace Courses.BotHandlers;
 
-public class TodayBotHandler : ScheduleBotHandlerBase
+public class WeekBotHandler : ScheduleBotHandlerBase
 {
-    public TodayBotHandler(
+    public WeekBotHandler(
         ITableRenderService tableRender,
         IScheduleService scheduleService) : base(tableRender, scheduleService)
     {
@@ -13,8 +13,7 @@ public class TodayBotHandler : ScheduleBotHandlerBase
     protected override (DateTime dateFrom, DateTime dateTo) GetTimeLimits()
     {
         var now = DateTime.Now.Date;
-        var nextDay = now.AddDays(1);
-
-        return new (now, nextDay);
+        var nextWeek = now.AddDays(7);
+        return new (now, nextWeek);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Courses.Configs;
+﻿using Courses.Abstractions;
+using Courses.Configs;
 using Courses.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -15,11 +16,11 @@ public class MainMenuBotHandler : BotHandlerBase
                 new[]
                 {
                     InlineKeyboardButton.WithCallbackData(text: "Cьогодні", ActionNames.GetScheduleToday),
-                    InlineKeyboardButton.WithCallbackData(text: "На тиждень", "get.schedule.week")
+                    InlineKeyboardButton.WithCallbackData(text: "На тиждень", ActionNames.GetScheduleWeek)
                 },
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData(text: "До кінця семестру", "get.schedule.semester.left"),
+                    InlineKeyboardButton.WithCallbackData(text: "До кінця семестру", ActionNames.GetScheduleSemesterLeft),
                     InlineKeyboardButton.WithCallbackData(text: "Інформація", ActionNames.GetAllInfo),
                 }
             }

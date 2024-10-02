@@ -5,7 +5,6 @@ namespace Courses.Models;
 public class TelegramTable
 {
     private readonly int _cols;
-
     private readonly List<string[]> _lines = new();
 
     public TelegramTable(int cols)

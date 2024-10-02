@@ -21,4 +21,21 @@ public class TableRenderService : ITableRenderService
 
         return table.GetRenderedText();
     }
+
+    public string GetScheduleInfo(ScheduleEntity[] schedules)
+    {
+        var table = new TelegramTable(3);
+
+        table.Add("№", "Час", "Дисціплина");
+        table.Add(string.Empty, "Тип", "Тема");
+        table.Add();
+        foreach (var s in schedules)
+        {
+            table.Add(s.TimeSlot.Id.ToString(), s.TimeSlot.TimeFrom + " - " + s.TimeSlot.TimeTo, s.WorkPlan.Topic.Discipline.Name );
+            table.Add(string.Empty, ( s.Lectures > 0 ? "Лекція " : "Практика " ) + s.Progress , s.WorkPlan.Topic.Name );
+            table.Add();
+        }
+
+        return table.GetRenderedText();
+    }
 }

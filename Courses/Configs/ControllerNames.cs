@@ -3,5 +3,4 @@
 public class ControllerNames
 {
     public const string Discipline = "discipline";
-
 }

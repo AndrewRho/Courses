@@ -2,9 +2,9 @@
 
 namespace Courses.BotHandlers;
 
-public class TodayBotHandler : ScheduleBotHandlerBase
+public class SemesterBotHandler : ScheduleBotHandlerBase
 {
-    public TodayBotHandler(
+    public SemesterBotHandler(
         ITableRenderService tableRender,
         IScheduleService scheduleService) : base(tableRender, scheduleService)
     {
@@ -13,8 +13,12 @@ public class TodayBotHandler : ScheduleBotHandlerBase
     protected override (DateTime dateFrom, DateTime dateTo) GetTimeLimits()
     {
         var now = DateTime.Now.Date;
-        var nextDay = now.AddDays(1);
+        var isAutumn = now.Month >= 9;
 
-        return new (now, nextDay);
+        var semesterEnds = isAutumn
+            ? new DateTime(now.Year, 12, 31)
+            : new DateTime(now.Year, 7, 1);
+
+        return new(now, semesterEnds);
     }
 }

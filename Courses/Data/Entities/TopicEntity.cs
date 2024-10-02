@@ -9,6 +9,5 @@ public class TopicEntity
     public int Number { get; set; }
     public string Name { get; set; } = string.Empty;
     public DisciplineEntity Discipline { get; set; } = new();
-
     public List<WorkPlanEntity> WorkPlans { get; set; } = new();
 }

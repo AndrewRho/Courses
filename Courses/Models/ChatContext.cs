@@ -9,7 +9,6 @@ public class ChatContext
     public ChatId ChatId { get;  }
     public long UserId { get; }
     public CancellationToken CancelToken { get; }
-
     public string FileId { get; set; } = string.Empty;
 
     public ChatContext(ITelegramBotClient client, ChatId chatId, long userId, CancellationToken cancelToken)

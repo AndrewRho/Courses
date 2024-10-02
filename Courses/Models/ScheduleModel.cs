@@ -8,5 +8,4 @@ public class ScheduleModel
     public int Practices { get; set; }
     public DateTime SlotDate { get; set; }
     public Guid DisciplineId { get; set; }
-
 }

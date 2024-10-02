@@ -1,8 +1,11 @@
-﻿using Courses.Models;
+﻿using Courses.Data.Entities;
+using Courses.Models;
 
 namespace Courses.Abstractions;
 
 public interface IScheduleService
 {
-    Task Process(ChatContext chatContext, string[] lines);
+    Task ProcessTextFile(ChatContext chatContext, string[] lines);
+
+    ScheduleEntity[] GetSchedule(DateTime dateFrom, DateTime dateTo, long userId);
 }

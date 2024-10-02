@@ -45,7 +45,7 @@ public class TextFileBotHandler : BotHandlerBase
 
         if (firstLine.Equals("Розклад занять"))
         {
-            await _scheduleService.Process(context, lines);
+            await _scheduleService.ProcessTextFile(context, lines);
         }
         else
         {

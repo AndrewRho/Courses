@@ -1,8 +1,7 @@
-﻿using Courses.Abstractions;
-using Courses.Models;
+﻿using Courses.Models;
 using Telegram.Bot;
 
-namespace Courses.BotHandlers;
+namespace Courses.Abstractions;
 
 public abstract class BotHandlerBase : IBotHandler
 {
