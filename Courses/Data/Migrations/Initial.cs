@@ -9,80 +9,80 @@ public class Initial : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.CreateTable("timeSlots", cb => new
+        migrationBuilder.CreateTable("TimeSlots", cb => new
             {
-                id = cb.Column<int>(),
-                timeFrom = cb.Column<string>(),
-                timeTo = cb.Column<string>()
+                Id = cb.Column<int>(),
+                TimeFrom = cb.Column<string>(),
+                TimeTo = cb.Column<string>()
             },
             constraints: ctb =>
             {
-                ctb.PrimaryKey("PK_timeSlots", t => t.id);
+                ctb.PrimaryKey("PK_TimeSlots", t => t.Id);
             });
         
-        migrationBuilder.CreateTable("users", cb => new
+        migrationBuilder.CreateTable("Users", cb => new
             {
-                id = cb.Column<long>(),
-                userName = cb.Column<string>()
+                Id = cb.Column<long>(),
+                UserName = cb.Column<string>()
             },
             constraints: ctb =>
             {
-                ctb.PrimaryKey("PK_users", x => x.id);
+                ctb.PrimaryKey("PK_Users", x => x.Id);
             });
         
-        migrationBuilder.CreateTable( "disciplines", cb => new
+        migrationBuilder.CreateTable( "Disciplines", cb => new
             {
-                id = cb.Column<Guid>(),
-                name = cb.Column<string>()
+                Id = cb.Column<Guid>(),
+                Name = cb.Column<string>()
             }, 
             constraints: ctb =>
             {
-                ctb.PrimaryKey("PK_disciplines", x => x.id);
+                ctb.PrimaryKey("PK_Disciplines", x => x.Id);
             });
 
-        migrationBuilder.CreateTable("topics", cb => new
+        migrationBuilder.CreateTable("Topics", cb => new
             {
-                id = cb.Column<Guid>(),
-                disciplineId = cb.Column<Guid>(),
-                number = cb.Column<int>(),
-                name = cb.Column<string>()
+                Id = cb.Column<Guid>(),
+                DisciplineId = cb.Column<Guid>(),
+                Number = cb.Column<int>(),
+                Name = cb.Column<string>()
             },
             constraints: ctb =>
             {
-                ctb.PrimaryKey("PK_topics", x => x.id);
-                ctb.ForeignKey("FK_topics_disciplines", x => x.disciplineId, "disciplines", "id");
+                ctb.PrimaryKey("PK_Topics", x => x.Id);
+                ctb.ForeignKey("FK_Topics_Disciplines", x => x.DisciplineId, "Disciplines", "Id");
             });
 
-        migrationBuilder.CreateTable("workPlans", cb => new
+        migrationBuilder.CreateTable("WorkPlans", cb => new
             {
-                id = cb.Column<Guid>(),
-                userId = cb.Column<long>(),
-                topicId = cb.Column<Guid>(),
-                lectures = cb.Column<int>(),
-                practices = cb.Column<int>()
+                Id = cb.Column<Guid>(),
+                UserId = cb.Column<long>(),
+                TopicId = cb.Column<Guid>(),
+                Lectures = cb.Column<int>(),
+                Practices = cb.Column<int>()
             },
             constraints: ctb =>
             {
-                ctb.PrimaryKey("PK_workPlans", x => x.id);
-                ctb.ForeignKey("FK_workPlans_users", x => x.userId, "users", "id");
-                ctb.ForeignKey("FK_workPlans_topics", x => x.topicId, "topics", "id");
+                ctb.PrimaryKey("PK_workPlans", x => x.Id);
+                ctb.ForeignKey("FK_workPlans_users", x => x.UserId, "Users", "Id");
+                ctb.ForeignKey("FK_workPlans_topics", x => x.TopicId, "Topics", "Id");
             });
 
-        migrationBuilder.CreateTable("schedules", cb => new
+        migrationBuilder.CreateTable("Schedules", cb => new
             {
-                id = cb.Column<Guid>(),
-                workPlanId = cb.Column<Guid>(),
-                timeSlotId = cb.Column<int>(),
-                lectures = cb.Column<int>(),
-                practices = cb.Column<int>(),
-                date = cb.Column<DateTime>(),
-                progress = cb.Column<string>()
+                Id = cb.Column<Guid>(),
+                WorkPlanId = cb.Column<Guid>(),
+                TimeSlotId = cb.Column<int>(),
+                Lectures = cb.Column<int>(),
+                Practices = cb.Column<int>(),
+                Date = cb.Column<DateTime>(),
+                Progress = cb.Column<string>()
             },
             constraints: ctb =>
             {
-                ctb.PrimaryKey("PK_schedules", x => x.id);
-                ctb.ForeignKey("FK_schedules_workPlans", x => x.workPlanId, "workPlans", "id");
-                ctb.ForeignKey("FK_schedules_timeSlot", x => x.timeSlotId, "timeSlots", "id");
+                ctb.PrimaryKey("PK_schedules", x => x.Id);
+                ctb.ForeignKey("FK_schedules_workPlans", x => x.WorkPlanId, "WorkPlans", "Id");
+                ctb.ForeignKey("FK_schedules_timeSlot", x => x.TimeSlotId, "TimeSlots", "Id");
             });
     }
 }

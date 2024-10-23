@@ -24,7 +24,7 @@ public class Startup
         InitApplication();
         ApplyMigrations();
         PopulateDictionaries();
-        StartBotHost();
+        //StartBotHost();
         _application.Run();
     }
 

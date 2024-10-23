@@ -20,6 +20,6 @@ public class CoursesBotContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(_connString);
+        optionsBuilder.UseNpgsql(_connString);
     }
 }
