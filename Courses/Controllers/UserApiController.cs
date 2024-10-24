@@ -17,27 +17,6 @@ public class UserApiController : Controller
         _contextFactory = contextFactory;
     }
 
-    [HttpPost("add")]
-    public JsonResult Add(long id, string userName)
-    {
-        var context = _contextFactory.GetContext();
-        var existingUser = context.Users.FirstOrDefault(x => x.Id == id || x.UserName == userName);
-        if (existingUser != null)
-        {
-            HttpContext.Response.StatusCode = 409;
-            return new JsonResult("Такий користувач вже існує");
-        }
-
-        context.Users.Add(new UserEntity
-        {
-            Id = id,
-            UserName = userName
-        });
-
-        context.SaveChanges();
-        return new JsonResult("OK");
-    }
-
     [HttpGet("getAll")]
     public JsonResult GetAll()
     {

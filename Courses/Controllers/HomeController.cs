@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Courses.Abstractions;
 using Courses.Configs;
+using Courses.Data.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +16,11 @@ namespace Courses.Controllers;
 public class HomeController : Controller
 {
     private readonly BotConfig _config;
+    private readonly ICoursesBotContextFactory _contextFactory;
 
-    public HomeController(IOptions<BotConfig> config)
+    public HomeController(IOptions<BotConfig> config, ICoursesBotContextFactory contextFactory)
     {
+        _contextFactory = contextFactory;
         _config = config.Value;
     }
 
@@ -60,6 +64,23 @@ public class HomeController : Controller
         if (computedHash.Equals(hash, StringComparison.InvariantCultureIgnoreCase))
         {
             await AuthorizeUser(userName);
+            var telegramId = long.Parse(id ?? "0");
+
+            var context = _contextFactory.GetContext();
+            var existingUser = context.Users.FirstOrDefault(x => x.Id == telegramId || x.UserName == userName);
+            if (existingUser != null)
+            {
+                HttpContext.Response.StatusCode = 409;
+                return new JsonResult("Такий користувач вже існує");
+            }
+
+            context.Users.Add(new UserEntity
+            {
+                Id = telegramId,
+                UserName = userName
+            });
+
+            await context.SaveChangesAsync();
         }
 
         return RedirectToAction("Index", "Home");
