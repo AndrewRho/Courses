@@ -1,10 +1,12 @@
 ﻿using Courses.Abstractions;
 using Courses.Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("disciplineApi")]
 public class DisciplineApiController : Controller

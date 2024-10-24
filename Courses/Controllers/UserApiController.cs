@@ -1,9 +1,11 @@
 ﻿using Courses.Abstractions;
 using Courses.Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Courses.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("userApi")]
 public class UserApiController : Controller

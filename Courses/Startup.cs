@@ -4,6 +4,7 @@ using Courses.Configs;
 using Courses.Data.Entities;
 using Courses.Factories;
 using Courses.Implementations;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace Courses;
@@ -44,6 +45,10 @@ public class Startup
     private void InitApplication()
     {
         var app = _builder.Build();
+        
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseRouting();
         app.UseSwagger();
         app.UseSwaggerUI();
@@ -78,6 +83,16 @@ public class Startup
     
     private void SetupBuilder()
     {
+        _builder.Services
+            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.LoginPath = "/home/telegramLogin";
+                options.AccessDeniedPath = "/home/telegramLogin";
+                options.ExpireTimeSpan = TimeSpan.FromDays(1);
+                options.Cookie.IsEssential = true;
+            });
+
         _builder.Services.AddMvc();
         _builder.Services.AddControllers();
 
