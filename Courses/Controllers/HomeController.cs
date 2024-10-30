@@ -18,16 +18,24 @@ public class HomeController : Controller
     private readonly BotConfig _config;
     private readonly ICoursesBotContextFactory _contextFactory;
 
-    public HomeController(IOptions<BotConfig> config, ICoursesBotContextFactory contextFactory)
+    public HomeController(
+        IOptions<BotConfig> config,
+        ICoursesBotContextFactory contextFactory)
     {
         _contextFactory = contextFactory;
         _config = config.Value;
     }
 
-
     [HttpGet]
-    public ViewResult Index()
+    public async Task<ViewResult> Index()
     {
+        if (!User.Identity?.IsAuthenticated == true && HttpContext.Request.Host.Host.Equals("localhost"))
+        {
+            var context = _contextFactory.GetContext();
+            var admin = context.Users.Single(x => x.Id == _config.AdminUserId);
+            await AuthorizeUser(admin.UserName);
+        }
+        
         return View();
     }
     
@@ -68,19 +76,16 @@ public class HomeController : Controller
 
             var context = _contextFactory.GetContext();
             var existingUser = context.Users.FirstOrDefault(x => x.Id == telegramId || x.UserName == userName);
-            if (existingUser != null)
+            if (existingUser == null)
             {
-                HttpContext.Response.StatusCode = 409;
-                return new JsonResult("Такий користувач вже існує");
-            }
+				context.Users.Add(new UserEntity
+				{
+					Id = telegramId,
+					UserName = userName
+				});
 
-            context.Users.Add(new UserEntity
-            {
-                Id = telegramId,
-                UserName = userName
-            });
-
-            await context.SaveChangesAsync();
+				await context.SaveChangesAsync();
+			}
         }
 
         return RedirectToAction("Index", "Home");

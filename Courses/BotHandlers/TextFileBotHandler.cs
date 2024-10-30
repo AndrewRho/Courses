@@ -14,16 +14,19 @@ public class TextFileBotHandler : BotHandlerBase
 
     private readonly IScheduleService _scheduleService;
     private readonly IWorkPlanService _workPlanService;
+    private readonly ITelegramRestClient _restClient;
     private readonly BotConfig _config;
 
     public TextFileBotHandler(
         IOptions<BotConfig> config,
+        ITelegramRestClient restClient,
         IWorkPlanService workPlanService,
-        IScheduleService scheduleService)
+        IScheduleService scheduleService) : base(restClient)
     {
         _config = config.Value;
         _scheduleService = scheduleService;
         _workPlanService = workPlanService;
+        _restClient = restClient;
     }
     
     public override Type GetNextHandlerType()
@@ -33,14 +36,7 @@ public class TextFileBotHandler : BotHandlerBase
 
     protected override async Task HandleSafe(ChatContext context)
     {
-        var httpClient = GetHttpClient();
-        var request = $"/bot{_config.TelegramToken}/getFile?file_id={context.FileId}";
-        var contents = await httpClient.GetStringAsync(request, context.CancelToken);
-        var parsed = JsonConvert.DeserializeObject < GetFileResponse>(contents);
-        
-        request = $"/file/bot{_config.TelegramToken}/{parsed?.Result.FilePath}";
-        contents = await httpClient.GetStringAsync(request, context.CancelToken);
-        var lines = Regex.Split(contents, "\r\n").Select( x => x.Trim().Prettify()).ToArray();
+        var lines = await _restClient.GetDownloadedLines(context.FileId);
         var firstLine = lines.First(x => !string.IsNullOrWhiteSpace(x));
 
         if (firstLine.Equals("Розклад занять"))
@@ -51,18 +47,5 @@ public class TextFileBotHandler : BotHandlerBase
         {
             await _workPlanService.Process(context, lines);
         }
-    }
-    
-    private HttpClient GetHttpClient()
-    {
-        lock ("telegram.download")
-        {
-            _client ??= new HttpClient
-            {
-                BaseAddress = new Uri(_config.TelegramDownloadUrl)
-            };
-        }
-
-        return _client;
     }
 }

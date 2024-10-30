@@ -25,14 +25,7 @@ public class Startup
         InitApplication();
         ApplyMigrations();
         PopulateDictionaries();
-        //StartBotHost();
         _application.Run();
-    }
-
-    private void StartBotHost()
-    {
-        var botHost = _application?.Services.GetRequiredService<IBotHost>();
-        botHost?.Start();
     }
     
     private void ApplyMigrations()
@@ -45,14 +38,16 @@ public class Startup
     private void InitApplication()
     {
         var app = _builder.Build();
+
+        app.UseRouting();
         
         app.UseAuthentication();
         app.UseAuthorization();
+        
+        app.UseEndpoints(e => e.MapControllers());
 
-        app.UseRouting();
         app.UseSwagger();
         app.UseSwaggerUI();
-        app.UseEndpoints(e => e.MapControllers());
 
         _application = app;
     }
@@ -87,8 +82,8 @@ public class Startup
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
-                options.LoginPath = "/home/telegramLogin";
-                options.AccessDeniedPath = "/home/telegramLogin";
+                options.LoginPath = "/home";
+                options.AccessDeniedPath = "/home";
                 options.ExpireTimeSpan = TimeSpan.FromDays(1);
                 options.Cookie.IsEssential = true;
             });
@@ -100,10 +95,10 @@ public class Startup
             .AddEndpointsApiExplorer()
             .AddSwaggerGen()
             .Configure<BotConfig>(_builder.Configuration.GetSection("BotConfig"))
-            .AddSingleton<IBotHost, BotHost>()
             .AddSingleton<ICoursesBotContextFactory, CoursesBotContextFactory>()
             .AddTransient<IBotHandlerFactory, BotHandlerFactory>()
             .AddTransient<ITableRenderService, TableRenderService>()
+            .AddTransient<ITelegramRestClient, TelegramRestClient>()
             .AddTransient<IWorkPlanService, WorkPlanService>()
             .AddTransient<IScheduleService, ScheduleService>()
             .AddTransient<StartBotHandler>()

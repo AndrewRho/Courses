@@ -7,16 +7,18 @@ namespace Courses.Implementations;
 public class WorkPlanService : IWorkPlanService
 {
     private readonly ICoursesBotContextFactory _contextFactory;
+    private readonly ITelegramRestClient _restClient;
 
-    public WorkPlanService(ICoursesBotContextFactory contextFactory)
+    public WorkPlanService(ICoursesBotContextFactory contextFactory, ITelegramRestClient restClient)
     {
         _contextFactory = contextFactory;
+        _restClient = restClient;
     }
 
     public async Task Process(ChatContext chatContext, string[] lines)
     {
         var firstLine = lines.First(x => !string.IsNullOrWhiteSpace(x));
-        await chatContext.Say( "Отримано план викладання дисціплини " + firstLine);
+        await _restClient.SendMessage( chatContext.ChatId, "Отримано план викладання дисціплини " + firstLine, false);
 
         using var dbContext = _contextFactory.GetContext();
         
@@ -25,7 +27,7 @@ public class WorkPlanService : IWorkPlanService
 
         if (existing == null)
         {
-            await chatContext.Say("Це - нова дисціплина, створюю записи");
+            await _restClient.SendMessage( chatContext.ChatId, "Це - нова дисціплина, створюю записи", false);
             existing = new DisciplineEntity
             {
                 Name = firstLine

@@ -1,5 +1,4 @@
 ﻿using Courses.Abstractions;
-using Courses.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,5 +62,4 @@ public class UserApiController : Controller
         context.SaveChanges();
         return new JsonResult("OK");
     }
-
 }

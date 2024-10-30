@@ -1,8 +1,6 @@
 ﻿using Courses.Abstractions;
 using Courses.Models;
 using Microsoft.EntityFrameworkCore;
-using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
 
 namespace Courses.BotHandlers;
 
@@ -12,8 +10,9 @@ public class InfoBotHandler : BotHandlerBase
     private readonly ICoursesBotContextFactory _contextFactory;
 
     public InfoBotHandler(
+        ITelegramRestClient restClient,
         ITableRenderService render,
-        ICoursesBotContextFactory contextFactory)
+        ICoursesBotContextFactory contextFactory) : base(restClient)
     {
         _render = render;
         _contextFactory = contextFactory;
@@ -57,7 +56,7 @@ public class InfoBotHandler : BotHandlerBase
         foreach (var m in models)
         {
             var table = _render.GetAllDisciplineInfo(m);
-            await context.Client.SendTextMessageAsync(context.ChatId, table, parseMode: ParseMode.Html, cancellationToken: context.CancelToken);
+            await Say(context, table, true);
         }
     }
 }

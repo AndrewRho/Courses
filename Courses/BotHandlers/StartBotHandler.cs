@@ -5,9 +5,13 @@ namespace Courses.BotHandlers;
 
 public class StartBotHandler : BotHandlerBase
 {
+    public StartBotHandler(ITelegramRestClient client) : base(client)
+    {
+    }
+
     protected override async Task HandleSafe(ChatContext context)
     {
-        await context.Say( GetGreeting() + " Оберіть потрібну дію.");
+        await Say( context, GetGreeting() + " Оберіть потрібну дію.", false);
     }
 
     public override Type GetNextHandlerType()

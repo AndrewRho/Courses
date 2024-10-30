@@ -45,40 +45,6 @@ public class BotHandlerFactory : IBotHandlerFactory
         return null;
     }
 
-    public ChatContext GetChatContext(ITelegramBotClient botClient, Update update, CancellationToken token)
-    {
-        var message = update.Message;
-        if (message != null)
-        {
-            var userId = message.From?.Id;
-            if (userId == null)
-            {
-                throw new NotImplementedException("Unknown case when user is null");
-            }
-
-            var chatId = message.Chat.Id;
-            var chatContext = new ChatContext(botClient, chatId, userId.Value, token); 
-            
-            if (update.Message?.Type == MessageType.Document)
-            {
-                var fileId = update.Message?.Document?.FileId ?? string.Empty; // todo fill in chatContext
-                chatContext.FileId = fileId;
-            }
-            
-            return chatContext;
-        }
-        
-        if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery?.Message != null)
-        {
-            var chatId = update.CallbackQuery.Message.Chat.Id;
-            var userId = update.CallbackQuery.From.Id;
-            var chatContext = new ChatContext(botClient, chatId, userId, token);
-            return chatContext;
-        }
-
-        throw new NotImplementedException();
-    }
-
     public IBotHandler? GetHandler(Type handlerType)
     {
         return _provider.GetRequiredService(handlerType) as IBotHandler;

@@ -8,15 +8,17 @@ namespace Courses.Implementations;
 public class ScheduleService : IScheduleService
 {
     private readonly ICoursesBotContextFactory _contextFactory;
+    private readonly ITelegramRestClient _restClient;
 
-    public ScheduleService(ICoursesBotContextFactory contextFactory)
+    public ScheduleService(ICoursesBotContextFactory contextFactory, ITelegramRestClient restClient)
     {
         _contextFactory = contextFactory;
+        _restClient = restClient;
     }
 
     public async Task ProcessTextFile(ChatContext chatContext, string[] lines)
     {
-        await chatContext.Say("Отримано розклад занять");
+        await _restClient.SendMessage(chatContext.ChatId, "Отримано розклад занять", false);
         using var dbContext = _contextFactory.GetContext();
         
         var slots = dbContext.TimeSlots.ToArray();
@@ -55,7 +57,7 @@ public class ScheduleService : IScheduleService
                 DisciplineName = disciplineName,
                 Lectures = isLecture ? 2 : 0,
                 Practices = isLecture ? 0 : 2,
-                SlotDate = DateTime.Parse(curDate)
+                SlotDate = GetUtc(curDate)
             });
         }
 
@@ -132,6 +134,16 @@ public class ScheduleService : IScheduleService
             .ToArray();
 
         return schedules;
+    }
+
+    private static DateTime GetUtc(string shortDate)
+    {
+        var split = shortDate.Split('.');
+        var day = int.Parse(split[0]);
+        var month = int.Parse(split[1]);
+        var year = int.Parse(split[2]);
+
+        return new DateTime(year, month, day, 0, 0, 0, 0, DateTimeKind.Utc);
     }
 
     private class WorkPlanExtended

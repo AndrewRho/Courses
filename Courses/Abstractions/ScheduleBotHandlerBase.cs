@@ -1,7 +1,5 @@
 ﻿using Courses.BotHandlers;
 using Courses.Models;
-using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
 
 namespace Courses.Abstractions;
 
@@ -11,12 +9,13 @@ public abstract class ScheduleBotHandlerBase : BotHandlerBase
     private readonly IScheduleService _scheduleService;
 
     protected ScheduleBotHandlerBase(
+        ITelegramRestClient restClient,
         ITableRenderService tableRender,
-        IScheduleService scheduleService)
+        IScheduleService scheduleService) : base(restClient)
     {
         _tableRender = tableRender;
         _scheduleService = scheduleService;
-    }
+    } 
     public override Type GetNextHandlerType()
     {
         return typeof(MainMenuBotHandler);
@@ -32,9 +31,9 @@ public abstract class ScheduleBotHandlerBase : BotHandlerBase
 
         foreach (var g in grouped)
         {
-            await context.Say(g.Key.ToLongDateString());
+            await Say(context, g.Key.ToLongDateString(), false);
             var table = _tableRender.GetScheduleInfo(g.ToArray());
-            await context.Client.SendTextMessageAsync(context.ChatId, table, parseMode: ParseMode.Html, cancellationToken: context.CancelToken);
+            await Say(context, table, true);
         }
     }
 }
